@@ -1,6 +1,6 @@
 # WizCo — Case Técnico Salesforce
 
-Sistema de gestão de **Pedidos de Suporte** desenvolvido como case técnico para a vaga de Desenvolvedor Salesforce na Wiz Co. O projeto cobre automações, regras de negócio, processamento assíncrono, API REST autenticada via JWT e portal de autoatendimento no Experience Cloud.
+Sistema de gestão de **Pedidos de Suporte** desenvolvido como case técnico para a vaga de Desenvolvedor Salesforce na Wiz Co. O projeto cobre automações, regras de negócio, processamento assíncrono, API REST e portal de autoatendimento no Experience Cloud.
 
 ---
 
@@ -16,7 +16,7 @@ Acesse o portal de autoatendimento do cliente:
 
 > Apresentação completa da solução (máx. 15 minutos)
 
-**[Assistir no YouTube](https://www.youtube.com/watch?v=SEU_VIDEO_ID_AQUI)**
+**[Assistir no YouTube](https://youtu.be/tH6NfaE8CC0)**
 
 ---
 
