@@ -79,27 +79,6 @@ Contexto `before insert / before update`:
 
 ---
 
-### API REST
-
-#### Autenticação — JWT Bearer Flow
-
-```
-POST /services/apexrest/auth
-Content-Type: application/json
-
-{ "username": "integracao@wizco.com" }
-```
-
-Resposta `200`:
-```json
-{ "token": "00Dxxx....<access_token>" }
-```
-
-**Fluxo interno:**
-1. Valida que o `username` é o usuário de integração configurado (`ConfiguracaoAuth__mdt`)
-2. Gera um JWT assinado com o certificado da org (`Crypto.signWithCertificate`)
-3. Troca o JWT pelo `access_token` no endpoint `POST /services/oauth2/token` com `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer`
-
 #### Criar Pedido de Suporte
 
 ```
@@ -165,126 +144,10 @@ sf org login web --alias wizco-org
 sf project deploy start --source-dir force-app
 ```
 
-### 3. Configurar o JWT Bearer
-
-1. **Setup > Certificate and Key Management** → criar ou importar certificado (ex: `WizCoJWT`)
-2. **Setup > App Manager > New Connected App** → habilitar OAuth, marcar *Enable JWT-based Flow*, anexar o certificado
-3. **Setup > Custom Metadata Types > ConfiguracaoAuth > Manage Records > Default** → preencher:
-
-| Campo | Valor |
-|---|---|
-| `ClientId__c` | Consumer Key do Connected App |
-| `CertificateName__c` | Nome do certificado (ex: `WizCoJWT`) |
-| `OrgUrl__c` | `https://login.salesforce.com` |
-| `PerfilIntegracao__c` | Nome do perfil do usuário de integração |
-| `UsuarioIntegracao__c` | Username do usuário de integração |
-
-4. **Setup > Remote Site Settings** → adicionar `https://login.salesforce.com`
-
-### 4. Executar testes
+### 3. Executar testes
 
 ```bash
 sf apex run test --test-level RunLocalTests --result-format human
-```
-
----
-
-## Testando com Postman
-
-### Importar a collection
-
-1. Abra o Postman
-2. Clique em **Import**
-3. Selecione o arquivo `postman/WizCo_API.postman_collection.json`
-4. A collection **WizCo — Pedidos de Suporte API** aparecerá na barra lateral
-
-### Configurar as variáveis
-
-Na collection, clique em **Variables** e preencha:
-
-| Variável | Valor |
-|---|---|
-| `base_url` | `https://playful-badger-kriaji-dev-ed.trailblaze.my.salesforce.com` |
-| `integration_user` | Username do usuário de integração (ex: `integracao@wizco.com`) |
-| `account_id` | Id de uma Account da org (ex: `001Xx000000XXXXX`) |
-
-> `access_token` é preenchido automaticamente após a autenticação.
-
-### Passo 1 — Autenticar via JWT
-
-Selecione **[Auth] Obter Token JWT** e clique em **Send**.
-
-```
-POST {{base_url}}/services/apexrest/auth
-Content-Type: application/json
-
-{
-  "username": "integracao@wizco.com"
-}
-```
-
-Resposta esperada (`200`):
-```json
-{
-  "token": "00Dg8000002cKUP!...",
-  "mensagem": "Autenticado com sucesso.",
-  "expiresIn": 3600
-}
-```
-
-O script de teste da request salva o `token` automaticamente em `{{access_token}}`.
-
-### Passo 2 — Criar Pedido de Suporte
-
-Selecione **[Pedidos] Criar Pedido de Suporte** e clique em **Send**.
-
-```
-POST {{base_url}}/services/apexrest/pedidos-suporte
-Authorization: Bearer {{access_token}}
-Content-Type: application/json
-
-{
-  "clienteId": "{{account_id}}",
-  "descricao": "Problema de acesso ao sistema após atualização.",
-  "prioridade": "Alta"
-}
-```
-
-Resposta esperada (`201`):
-```json
-{
-  "pedidoId": "a01Xx000000XXXXX",
-  "mensagem": "Pedido de suporte criado com sucesso."
-}
-```
-
-### Respostas de erro
-
-| Código | Causa | Como resolver |
-|---|---|---|
-| `400` | `clienteId` ausente ou Account não encontrada | Verifique o Id da Account na org |
-| `401` | Token expirado ou usuário sem perfil de integração | Execute novamente o endpoint de auth |
-| `500` | Erro interno no servidor | Verifique os logs em Setup > Apex Jobs |
-
----
-
-## Comandos Úteis
-
-```bash
-# Deploy completo
-sf project deploy start --source-dir force-app
-
-# Acompanhar resultado do último deploy
-sf project deploy report
-
-# Rodar testes com cobertura
-sf apex run test --test-level RunLocalTests --code-coverage
-
-# Abrir org no browser
-sf org open
-
-# Agendar o batch de inatividade (via Developer Console / Anonymous Apex)
-# System.schedule('Batch Pedido Suporte', '0 0 8 * * ?', new PedidoSuporteBatchSchedule());
 ```
 
 ---
