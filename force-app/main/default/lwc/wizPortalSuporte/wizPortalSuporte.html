@@ -1,0 +1,90 @@
+<template>
+    <div class="wiz-portal">
+
+        <!-- ── HEADER ─────────────────────────────── -->
+        <header class="wiz-header">
+            <div class="wiz-header-inner">
+                <img class="wiz-logo" src={logoUrl} alt="Wiz Co" />
+                <div class="wiz-header-tagline">
+                    <span>Portal de Suporte ao Cliente</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ── HERO ───────────────────────────────── -->
+        <section class="wiz-hero">
+            <div class="wiz-hero-inner">
+                <h1 class="wiz-hero-title">Como podemos te ajudar?</h1>
+                <p class="wiz-hero-sub">
+                    Abra um novo chamado ou acompanhe uma solicitação existente de forma rápida e simples.
+                </p>
+                <div class="wiz-hero-badges">
+                    <span class="wiz-badge">
+                        <span class="wiz-badge-icon">&#128203;</span> Novo pedido de suporte
+                    </span>
+                    <span class="wiz-badge">
+                        <span class="wiz-badge-icon">&#128172;</span> Acompanhar solicitação
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── FLOW CARD ──────────────────────────── -->
+        <main class="wiz-main">
+            <div class="wiz-card">
+                <div class="wiz-card-header">
+                    <span class="wiz-card-dot"></span>
+                    <span class="wiz-card-dot wiz-card-dot--mid"></span>
+                    <span class="wiz-card-dot wiz-card-dot--sm"></span>
+                    <span class="wiz-card-title">Central de Atendimento</span>
+                </div>
+
+                <div class="wiz-card-body">
+                    <template if:false={flowCompleted}>
+                        <lightning-flow
+                            flow-api-name={flowApiName}
+                            onstatuschange={handleStatusChange}>
+                        </lightning-flow>
+                    </template>
+
+                    <template if:true={flowCompleted}>
+                        <div class="wiz-success">
+                            <div class="wiz-success-circle">
+                                <svg viewBox="0 0 52 52" class="wiz-checkmark">
+                                    <circle cx="26" cy="26" r="25" fill="none"/>
+                                    <path fill="none" d="M14 27 l7 7 17-17"/>
+                                </svg>
+                            </div>
+                            <h2 class="wiz-success-title">Tudo certo!</h2>
+                            <p class="wiz-success-msg">
+                                Sua solicitação foi registrada com sucesso.<br/>
+                                Nossa equipe entrará em contato em breve.
+                            </p>
+                            <button class="wiz-btn-primary" onclick={handleRestart}>
+                                Nova solicitação
+                            </button>
+                        </div>
+                    </template>
+
+                    <template if:true={flowError}>
+                        <div class="wiz-error">
+                            <span class="wiz-error-icon">&#9888;</span>
+                            <p>Ocorreu um erro ao processar sua solicitação. Tente novamente.</p>
+                            <button class="wiz-btn-outline" onclick={handleRestart}>Tentar novamente</button>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </main>
+
+        <!-- ── FOOTER ─────────────────────────────── -->
+        <footer class="wiz-footer">
+            <div class="wiz-footer-inner">
+                <span class="wiz-footer-logo">WIZ&#10097;</span>
+                <span class="wiz-footer-sep">|</span>
+                <span>&copy; {currentYear} Wiz Co. Todos os direitos reservados.</span>
+            </div>
+        </footer>
+
+    </div>
+</template>

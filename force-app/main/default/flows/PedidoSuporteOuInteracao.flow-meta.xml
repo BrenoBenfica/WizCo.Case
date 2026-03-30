@@ -1,0 +1,784 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+
+    <!-- ═══════════════════════════════════════════
+         VARIÁVEIS
+    ═══════════════════════════════════════════ -->
+    <variables>
+        <name>varContaId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+
+    <!-- ═══════════════════════════════════════════
+         CHOICES — Tipo de solicitação
+    ═══════════════════════════════════════════ -->
+    <choices>
+        <name>Choice_PedidoSuporte</name>
+        <choiceText>Pedido de suporte</choiceText>
+        <dataType>String</dataType>
+        <value>
+            <stringValue>Pedido de suporte</stringValue>
+        </value>
+    </choices>
+    <choices>
+        <name>Choice_InteracaoSuporte</name>
+        <choiceText>Interação ao suporte</choiceText>
+        <dataType>String</dataType>
+        <value>
+            <stringValue>Interação ao suporte</stringValue>
+        </value>
+    </choices>
+
+    <!-- ═══════════════════════════════════════════
+         DYNAMIC CHOICE SET — Pedidos abertos do cliente
+    ═══════════════════════════════════════════ -->
+    <dynamicChoiceSets>
+        <name>DCS_PedidosAbertos</name>
+        <dataType>String</dataType>
+        <displayField>Name</displayField>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Cliente__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>varContaId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Status__c</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <stringValue>Resolvido</stringValue>
+            </value>
+        </filters>
+        <object>PedidoSuporte__c</object>
+        <valueField>Id</valueField>
+    </dynamicChoiceSets>
+
+    <!-- ═══════════════════════════════════════════
+         DECISION — Tipo de solicitação
+    ═══════════════════════════════════════════ -->
+    <decisions>
+        <name>Decisao_Tipo_Solicitacao</name>
+        <label>Tipo de solicitação?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Tela1_InformarEmail_Interacao</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Interação ao suporte</defaultConnectorLabel>
+        <rules>
+            <name>Rule_PedidoSuporte</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>TipoSolicitacao</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <elementReference>Choice_PedidoSuporte</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Tela1_PedidoSuporte</targetReference>
+            </connector>
+            <label>Pedido de suporte</label>
+        </rules>
+    </decisions>
+
+    <!-- ═══════════════════════════════════════════
+         DECISION — Conta existe? (path pedido de suporte)
+    ═══════════════════════════════════════════ -->
+    <decisions>
+        <name>Conta_Existe</name>
+        <label>Conta existe?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Criar_Conta</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Não</defaultConnectorLabel>
+        <rules>
+            <name>Rule_ContaExiste</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Buscar_Conta_Suporte.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_ContaId_Existente</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+
+    <!-- ═══════════════════════════════════════════
+         DECISION — Pedidos abertos? (path interação)
+    ═══════════════════════════════════════════ -->
+    <decisions>
+        <name>Pedidos_Abertos</name>
+        <label>Pedidos abertos?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Tela_Sem_Pedidos</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Não</defaultConnectorLabel>
+        <rules>
+            <name>Rule_TemPedidosAbertos</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Buscar_Pedido_Check.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Tela1b_SelecionarPedido</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+
+    <!-- ═══════════════════════════════════════════
+         SCREENS
+    ═══════════════════════════════════════════ -->
+
+    <!-- Tela inicial: Tipo de solicitação -->
+    <screens>
+        <name>Tipo_de_Solicitacao</name>
+        <label>Tipo de solicitação</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Decisao_Tipo_Solicitacao</targetReference>
+        </connector>
+        <fields>
+            <name>TipoSolicitacao</name>
+            <choiceReferences>Choice_PedidoSuporte</choiceReferences>
+            <choiceReferences>Choice_InteracaoSuporte</choiceReferences>
+            <dataType>String</dataType>
+            <fieldText>Tipo de solicitação</fieldText>
+            <fieldType>RadioButtons</fieldType>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <helpText>&lt;p&gt;Escolha o tipo de pedido&lt;/p&gt;</helpText>
+        <nextOrFinishButtonLabel>Avançar</nextOrFinishButtonLabel>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+    </screens>
+
+    <!-- PEDIDO DE SUPORTE — Tela 1: Nome + e-mail -->
+    <screens>
+        <name>Tela1_PedidoSuporte</name>
+        <label>Pedido de suporte</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Buscar_Conta_Suporte</targetReference>
+        </connector>
+        <fields>
+            <name>NomeCliente</name>
+            <dataType>String</dataType>
+            <fieldText>Nome</fieldText>
+            <fieldType>InputField</fieldType>
+            <helpText>&lt;p&gt;Informe seu nome completo&lt;/p&gt;</helpText>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <fields>
+            <name>EmailCliente</name>
+            <dataType>String</dataType>
+            <fieldText>E-mail</fieldText>
+            <fieldType>InputField</fieldType>
+            <helpText>&lt;p&gt;Informe seu e-mail&lt;/p&gt;</helpText>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <nextOrFinishButtonLabel>Avançar</nextOrFinishButtonLabel>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+    </screens>
+
+    <!-- PEDIDO DE SUPORTE — Tela 2: Descrição do problema -->
+    <screens>
+        <name>Tela2_DescricaoProblema</name>
+        <label>Descrição do problema</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Criar_Pedido</targetReference>
+        </connector>
+        <fields>
+            <name>DescricaoProblema</name>
+            <dataType>String</dataType>
+            <fieldText>Descrição do problema</fieldText>
+            <fieldType>LargeTextArea</fieldType>
+            <helpText>&lt;p&gt;Descreva detalhadamente o problema que está enfrentando&lt;/p&gt;</helpText>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <nextOrFinishButtonLabel>Enviar</nextOrFinishButtonLabel>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+    </screens>
+
+    <!-- PEDIDO DE SUPORTE — Tela de confirmação: Pedido criado! -->
+    <screens>
+        <name>Tela_PedidoCriado</name>
+        <label>Pedido criado!</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <fields>
+            <name>Msg_PedidoCriado</name>
+            <fieldText>&lt;p&gt;&lt;strong&gt;Pedido criado com sucesso!&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Seu pedido de suporte foi registrado. Em breve nossa equipe entrará em contato.&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <nextOrFinishButtonLabel>Concluir</nextOrFinishButtonLabel>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+    </screens>
+
+    <!-- INTERAÇÃO AO SUPORTE — Tela 1: Informar e-mail -->
+    <screens>
+        <name>Tela1_InformarEmail_Interacao</name>
+        <label>Interação ao suporte</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Buscar_Conta_Interacao</targetReference>
+        </connector>
+        <fields>
+            <name>EmailClienteInteracao</name>
+            <dataType>String</dataType>
+            <fieldText>E-mail</fieldText>
+            <fieldType>InputField</fieldType>
+            <helpText>&lt;p&gt;Informe seu e-mail para buscarmos seus pedidos abertos&lt;/p&gt;</helpText>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <nextOrFinishButtonLabel>Buscar</nextOrFinishButtonLabel>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+    </screens>
+
+    <!-- INTERAÇÃO AO SUPORTE — Sem pedidos abertos (Redirecionamento) -->
+    <screens>
+        <name>Tela_Sem_Pedidos</name>
+        <label>Sem pedidos</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <isGoTo>true</isGoTo>
+            <targetReference>Tela2_DescricaoProblema</targetReference>
+        </connector>
+        <fields>
+            <name>Msg_SemPedidos</name>
+            <fieldText>&lt;p&gt;Você não possui pedidos de suporte abertos no momento.&lt;/p&gt;&lt;p&gt;Clique em &lt;strong&gt;Criar pedido&lt;/strong&gt; para abrir um novo pedido de suporte.&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <nextOrFinishButtonLabel>Criar pedido</nextOrFinishButtonLabel>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+    </screens>
+
+    <!-- INTERAÇÃO AO SUPORTE — Tela 1b: Selecionar pedido -->
+    <screens>
+        <name>Tela1b_SelecionarPedido</name>
+        <label>Selecionar pedido</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Buscar_Interacoes_Pedido</targetReference>
+        </connector>
+        <fields>
+            <name>PedidoSelecionado</name>
+            <choiceReferences>DCS_PedidosAbertos</choiceReferences>
+            <dataType>String</dataType>
+            <fieldText>Selecione o pedido de suporte</fieldText>
+            <fieldType>RadioButtons</fieldType>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <nextOrFinishButtonLabel>Avançar</nextOrFinishButtonLabel>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+    </screens>
+
+    <!-- INTERAÇÃO AO SUPORTE — Tela 2: Interações + nova mensagem -->
+    <screens>
+        <name>Tela2_Interacoes</name>
+        <label>Interações</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Criar_Interacao</targetReference>
+        </connector>
+        <fields>
+            <name>Header_Interacoes</name>
+            <fieldText>&lt;p&gt;&lt;strong&gt;Histórico do pedido&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Utilize o campo abaixo para enviar uma nova mensagem para a equipe de suporte.&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <fields>
+            <name>NovaMensagem</name>
+            <dataType>String</dataType>
+            <fieldText>Nova mensagem</fieldText>
+            <fieldType>LargeTextArea</fieldType>
+            <helpText>&lt;p&gt;Descreva sua atualização ou dúvida&lt;/p&gt;</helpText>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <nextOrFinishButtonLabel>Enviar</nextOrFinishButtonLabel>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+    </screens>
+
+    <!-- INTERAÇÃO AO SUPORTE — Tela de confirmação: Interação criada! -->
+    <screens>
+        <name>Tela_InteracaoCriada</name>
+        <label>Interação criada!</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <fields>
+            <name>Msg_InteracaoCriada</name>
+            <fieldText>&lt;p&gt;&lt;strong&gt;Mensagem enviada com sucesso!&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Sua interação foi registrada. Nossa equipe entrará em contato em breve.&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <nextOrFinishButtonLabel>Concluir</nextOrFinishButtonLabel>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+    </screens>
+
+    <!-- ═══════════════════════════════════════════
+         GET RECORDS
+    ═══════════════════════════════════════════ -->
+
+    <!-- Buscar conta por e-mail (path pedido de suporte) -->
+    <recordLookups>
+        <name>Buscar_Conta_Suporte</name>
+        <label>Buscar conta</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Conta_Existe</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Email__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>EmailCliente</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Account</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+
+    <!-- Buscar conta por e-mail (path interação ao suporte) -->
+    <recordLookups>
+        <name>Buscar_Conta_Interacao</name>
+        <label>Buscar conta e pedidos abertos</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Assign_ContaId_Interacao</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Email__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>EmailClienteInteracao</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Account</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+
+    <!-- Verificar se existem pedidos abertos para o cliente -->
+    <recordLookups>
+        <name>Buscar_Pedido_Check</name>
+        <label>Buscar pedidos abertos</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Pedidos_Abertos</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Cliente__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>varContaId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Status__c</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <stringValue>Resolvido</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>PedidoSuporte__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+
+    <!-- Buscar interações do pedido selecionado -->
+    <recordLookups>
+        <name>Buscar_Interacoes_Pedido</name>
+        <label>Buscar interações do pedido</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Tela2_Interacoes</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>PedidoSuporte__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>PedidoSelecionado</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <object>Interacao__c</object>
+        <sortField>Data__c</sortField>
+        <sortOrder>Asc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+
+    <!-- ═══════════════════════════════════════════
+         CREATE RECORDS
+    ═══════════════════════════════════════════ -->
+
+    <!-- Criar conta (quando conta não existe) -->
+    <recordCreates>
+        <name>Criar_Conta</name>
+        <label>Criar conta</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Assign_ContaId_Nova</targetReference>
+        </connector>
+        <inputAssignments>
+            <field>Name</field>
+            <value>
+                <elementReference>NomeCliente</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Email__c</field>
+            <value>
+                <elementReference>EmailCliente</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Account</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+
+    <!-- Criar pedido de suporte -->
+    <recordCreates>
+        <name>Criar_Pedido</name>
+        <label>Criar pedido de suporte</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Criar_Interacao_Inicial</targetReference>
+        </connector>
+        <inputAssignments>
+            <field>Cliente__c</field>
+            <value>
+                <elementReference>varContaId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Descricao__c</field>
+            <value>
+                <elementReference>DescricaoProblema</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status__c</field>
+            <value>
+                <stringValue>Novo</stringValue>
+            </value>
+        </inputAssignments>
+        <object>PedidoSuporte__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+
+    <!-- Criar interação inicial vinculada ao pedido criado -->
+    <recordCreates>
+        <name>Criar_Interacao_Inicial</name>
+        <label>Criar registros</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Tela_PedidoCriado</targetReference>
+        </connector>
+        <inputAssignments>
+            <field>PedidoSuporte__c</field>
+            <value>
+                <elementReference>Criar_Pedido</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Mensagem__c</field>
+            <value>
+                <elementReference>DescricaoProblema</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Tipo__c</field>
+            <value>
+                <stringValue>Cliente</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Data__c</field>
+            <value>
+                <elementReference>$Flow.CurrentDateTime</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Interacao__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+
+    <!-- Criar nova interação no pedido existente -->
+    <recordCreates>
+        <name>Criar_Interacao</name>
+        <label>Criar interação</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Tela_InteracaoCriada</targetReference>
+        </connector>
+        <inputAssignments>
+            <field>PedidoSuporte__c</field>
+            <value>
+                <elementReference>PedidoSelecionado</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Mensagem__c</field>
+            <value>
+                <elementReference>NovaMensagem</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Tipo__c</field>
+            <value>
+                <stringValue>Cliente</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Data__c</field>
+            <value>
+                <elementReference>$Flow.CurrentDateTime</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Interacao__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+
+    <!-- ═══════════════════════════════════════════
+         ASSIGNMENTS
+    ═══════════════════════════════════════════ -->
+
+    <!-- Definir varContaId a partir da conta existente (path suporte) -->
+    <assignments>
+        <name>Assign_ContaId_Existente</name>
+        <label>Definir ID da conta existente</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varContaId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Buscar_Conta_Suporte.Id</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Tela2_DescricaoProblema</targetReference>
+        </connector>
+    </assignments>
+
+    <!-- Definir varContaId a partir da conta recém-criada -->
+    <assignments>
+        <name>Assign_ContaId_Nova</name>
+        <label>Definir ID da nova conta</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varContaId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Criar_Conta</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <isGoTo>true</isGoTo>
+            <targetReference>Tela2_DescricaoProblema</targetReference>
+        </connector>
+    </assignments>
+
+    <!-- Definir varContaId a partir da conta encontrada no path interação -->
+    <assignments>
+        <name>Assign_ContaId_Interacao</name>
+        <label>Definir ID da conta (interação)</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varContaId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Buscar_Conta_Interacao.Id</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Buscar_Pedido_Check</targetReference>
+        </connector>
+    </assignments>
+
+    <!-- ═══════════════════════════════════════════
+         START
+    ═══════════════════════════════════════════ -->
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Tipo_de_Solicitacao</targetReference>
+        </connector>
+    </start>
+
+    <!-- ═══════════════════════════════════════════
+         METADATA
+    ═══════════════════════════════════════════ -->
+    <customProperties>
+        <name>ScreenProgressIndicator</name>
+        <value>
+            <stringValue>{"location":"top","type":"simple"}</stringValue>
+        </value>
+    </customProperties>
+    <environments>Default</environments>
+    <interviewLabel>PedidoSuporteOuInteracao {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Pedido de Suporte ou Interação</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>Flow</processType>
+    <status>Active</status>
+</Flow>

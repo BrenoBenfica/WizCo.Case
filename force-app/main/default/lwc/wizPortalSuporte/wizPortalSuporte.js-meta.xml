@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Wiz — Portal de Suporte</masterLabel>
+    <description>Página principal do portal de suporte ao cliente da Wiz Co. Incorpora o flow de abertura e acompanhamento de chamados com identidade visual da marca.</description>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightningCommunity__Default">
+            <property
+                name="flowApiName"
+                type="String"
+                default="PedidoSuporteOuInteracao"
+                label="API Name do Flow"
+                description="Nome da API do Screen Flow a ser incorporado nesta página." />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

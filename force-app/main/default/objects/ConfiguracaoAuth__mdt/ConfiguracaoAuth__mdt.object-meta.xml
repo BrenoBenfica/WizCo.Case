@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Configuração do Connected App e do perfil de integração para autenticação OAuth da API REST</description>
+    <label>Configuracao Auth</label>
+    <pluralLabel>Configuracoes Auth</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

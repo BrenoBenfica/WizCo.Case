@@ -1,0 +1,283 @@
+:host {
+    display: block;
+    --wiz-orange:       #F5820D;
+    --wiz-orange-dark:  #CC6A00;
+    --wiz-orange-light: #FFF0E0;
+    --wiz-text:         #1A1A1A;
+    --wiz-text-muted:   #666666;
+    --wiz-bg:           #F7F8FA;
+    --wiz-white:        #FFFFFF;
+    --wiz-radius:       12px;
+    --wiz-shadow:       0 4px 24px rgba(0, 0, 0, 0.08);
+    font-family: 'Salesforce Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+}
+
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+.wiz-portal {
+    min-height: 100vh;
+    background-color: var(--wiz-bg);
+    display: flex;
+    flex-direction: column;
+}
+
+/* ─────────────── HEADER ─────────────── */
+.wiz-header {
+    background: linear-gradient(135deg, var(--wiz-orange) 0%, var(--wiz-orange-dark) 100%);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.wiz-header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Logo */
+.wiz-logo {
+    height: 36px;
+    width: auto;
+    display: block;
+}
+
+.wiz-header-tagline {
+    border-left: 2px solid rgba(255,255,255,0.4);
+    padding-left: 16px;
+    color: rgba(255,255,255,0.9);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+/* ─────────────── HERO ─────────────── */
+.wiz-hero {
+    background: linear-gradient(160deg, var(--wiz-orange-dark) 0%, #A85500 100%);
+    padding: 52px 28px 60px;
+    text-align: center;
+}
+
+.wiz-hero-inner {
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.wiz-hero-title {
+    color: #fff;
+    font-size: clamp(24px, 4vw, 36px);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 12px;
+}
+
+.wiz-hero-sub {
+    color: rgba(255,255,255,0.88);
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 28px;
+}
+
+.wiz-hero-badges {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.wiz-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    backdrop-filter: blur(4px);
+}
+
+.wiz-badge-icon { font-size: 15px; }
+
+/* ─────────────── MAIN ─────────────── */
+.wiz-main {
+    flex: 1;
+    max-width: 840px;
+    width: 100%;
+    margin: -28px auto 48px;
+    padding: 0 20px;
+}
+
+/* ─────────────── CARD ─────────────── */
+.wiz-card {
+    background: var(--wiz-white);
+    border-radius: var(--wiz-radius);
+    box-shadow: var(--wiz-shadow);
+    overflow: hidden;
+}
+
+.wiz-card-header {
+    background: var(--wiz-orange-light);
+    border-bottom: 3px solid var(--wiz-orange);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wiz-card-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--wiz-orange);
+    display: inline-block;
+    flex-shrink: 0;
+}
+.wiz-card-dot--mid { width: 9px; height: 9px; opacity: 0.6; }
+.wiz-card-dot--sm  { width: 6px; height: 6px; opacity: 0.35; }
+
+.wiz-card-title {
+    margin-left: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--wiz-orange-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.wiz-card-body {
+    padding: 32px 36px 40px;
+}
+
+/* ─────────────── SUCCESS ─────────────── */
+.wiz-success {
+    text-align: center;
+    padding: 48px 24px 32px;
+}
+
+.wiz-success-circle {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--wiz-orange);
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wiz-checkmark {
+    width: 40px;
+    height: 40px;
+}
+.wiz-checkmark circle {
+    stroke: rgba(255,255,255,0.4);
+    stroke-width: 2;
+}
+.wiz-checkmark path {
+    stroke: #fff;
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 0;
+}
+
+.wiz-success-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--wiz-text);
+    margin-bottom: 10px;
+}
+
+.wiz-success-msg {
+    font-size: 15px;
+    color: var(--wiz-text-muted);
+    line-height: 1.6;
+    margin-bottom: 28px;
+}
+
+/* ─────────────── ERROR ─────────────── */
+.wiz-error {
+    text-align: center;
+    padding: 40px 24px;
+}
+.wiz-error-icon {
+    font-size: 36px;
+    display: block;
+    margin-bottom: 12px;
+}
+.wiz-error p {
+    font-size: 15px;
+    color: var(--wiz-text-muted);
+    margin-bottom: 20px;
+}
+
+/* ─────────────── BUTTONS ─────────────── */
+.wiz-btn-primary {
+    background: var(--wiz-orange);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 36px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    outline: none;
+}
+.wiz-btn-primary:hover  { background: var(--wiz-orange-dark); }
+.wiz-btn-primary:active { transform: scale(0.98); }
+
+.wiz-btn-outline {
+    background: transparent;
+    color: var(--wiz-orange);
+    border: 2px solid var(--wiz-orange);
+    border-radius: 8px;
+    padding: 10px 28px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.wiz-btn-outline:hover {
+    background: var(--wiz-orange);
+    color: #fff;
+}
+
+/* ─────────────── FOOTER ─────────────── */
+.wiz-footer {
+    background: #1A1A1A;
+    padding: 18px 28px;
+    text-align: center;
+    margin-top: auto;
+}
+.wiz-footer-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255,255,255,0.5);
+    font-size: 12px;
+}
+.wiz-footer-logo {
+    color: var(--wiz-orange);
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: -0.5px;
+}
+.wiz-footer-sep { opacity: 0.3; }
+
+/* ─────────────── RESPONSIVE ─────────────── */
+@media (max-width: 600px) {
+    .wiz-card-body    { padding: 24px 20px 32px; }
+    .wiz-hero         { padding: 40px 20px 52px; }
+    .wiz-header-inner { padding: 14px 20px; }
+    .wiz-header-tagline { display: none; }
+}
